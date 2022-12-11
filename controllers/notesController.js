@@ -40,7 +40,7 @@ const createNewNote = asyncHandler(async (req, res) => {
 
 	const noteObject = { user, title, text };
 
-	const note = Note.create(noteObject);
+	const note = await Note.create(noteObject);
 
 	if (note) {
 		res.status(201).json({ message: `Заметка успешно создана` });
