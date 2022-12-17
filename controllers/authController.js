@@ -31,13 +31,13 @@ const login = asyncHandler(async (req, res) => {
 			},
 		},
 		process.env.ACCESS_TOKEN_SECRET,
-		{ expiresIn: '15m' },
+		{ expiresIn: '10s' },
 	);
 
 	const refreshToken = jwt.sign(
 		{ username: foundUser.username },
 		process.env.REFRESH_TOKEN_SECRET,
-		{ expiresIn: '7d' },
+		{ expiresIn: '20s' },
 	);
 
 	res.cookie('jwt', refreshToken, {
@@ -67,7 +67,8 @@ const refresh = (req, res) => {
 		refreshToken,
 		process.env.REFRESH_TOKEN_SECRET,
 		asyncHandler(async (err, decoded) => {
-			if (err) return res.status(403).json({ message: 'нет прав доступа к содержимому' });
+			if (err)
+				return res.status(403).json({ message: 'Срок действия вашего логина истек...' });
 
 			const foundUser = await User.findOne({ username: decoded.username }).exec();
 
@@ -81,7 +82,7 @@ const refresh = (req, res) => {
 					},
 				},
 				process.env.ACCESS_TOKEN_SECRET,
-				{ expiresIn: '15m' },
+				{ expiresIn: '10s' },
 			);
 
 			res.json({ accessToken });
