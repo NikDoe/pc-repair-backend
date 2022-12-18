@@ -22,14 +22,11 @@ const getAllUsers = asyncHandler(async (req, res) => {
 const createNewUser = asyncHandler(async (req, res) => {
 	const { username, password, roles } = req.body;
 
-	if (!username || !password || !Array.isArray(roles) || !roles.length) {
+	if (!username || !password) {
 		return res.status(400).json({ message: 'Пожалуйста, заполните все поля' });
 	}
 
-	const duplicate = await User.findOne({ username })
-		.collation({ locale: 'en', strength: 2 })
-		.lean()
-		.exec();
+	const duplicate = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec();
 
 	if (duplicate) {
 		return res.status(409).json({ message: 'Пользователь с таким username уже существует' });
@@ -37,7 +34,10 @@ const createNewUser = asyncHandler(async (req, res) => {
 
 	const hashedPwd = await bcrypt.hash(password, 10);
 
-	const userObject = { username, password: hashedPwd, roles };
+	const userObject =
+		!Array.isArray(roles) || !roles.length
+			? { username, password: hashedPwd }
+			: { username, password: hashedPwd, roles };
 
 	const user = await User.create(userObject);
 
@@ -55,9 +55,7 @@ const updateUser = asyncHandler(async (req, res) => {
 	const { id, username, roles, active, password } = req.body;
 
 	if (!id || !username || !Array.isArray(roles) || !roles.length || typeof active !== 'boolean') {
-		return res
-			.status(400)
-			.json({ message: 'Все поля, кроме пароля, обязательны для заполнения' });
+		return res.status(400).json({ message: 'Все поля, кроме пароля, обязательны для заполнения' });
 	}
 
 	const user = await User.findById(id).exec();
@@ -66,10 +64,7 @@ const updateUser = asyncHandler(async (req, res) => {
 		return res.status(400).json({ message: 'Пользователь не найден' });
 	}
 
-	const duplicate = await User.findOne({ username })
-		.collation({ locale: 'en', strength: 2 })
-		.lean()
-		.exec();
+	const duplicate = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec();
 
 	// Allow updates to the original user
 	if (duplicate && duplicate?._id.toString() !== id) {
@@ -101,9 +96,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 	const note = await Note.findOne({ user: id }).lean().exec();
 	if (note) {
-		return res
-			.status(400)
-			.json({ message: 'Нельзя удалить пользователя с одной или более заметками' });
+		return res.status(400).json({ message: 'Нельзя удалить пользователя с одной или более заметками' });
 	}
 
 	const user = await User.findById(id).exec();
