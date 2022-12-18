@@ -1,11 +1,10 @@
 const Note = require('../models/Note');
-const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 
 // @desc Get all notes
 // @route GET /notes
 // @access Private
-const getAllNotes = asyncHandler(async (req, res) => {
+const getAllNotes = async (req, res) => {
 	const notes = await Note.find().lean();
 
 	if (!notes?.length) {
@@ -20,12 +19,12 @@ const getAllNotes = asyncHandler(async (req, res) => {
 	);
 
 	res.json(notesWithUser);
-});
+};
 
 // @desc Create new note
 // @route POST /notes
 // @access Private
-const createNewNote = asyncHandler(async (req, res) => {
+const createNewNote = async (req, res) => {
 	const { user, title, text } = req.body;
 
 	if (!user || !title || !text) {
@@ -50,12 +49,12 @@ const createNewNote = asyncHandler(async (req, res) => {
 	} else {
 		res.status(400).json({ message: 'Получены неверные данные' });
 	}
-});
+};
 
 // @desc Update a note
 // @route PATCH /notes
 // @access Private
-const updateNote = asyncHandler(async (req, res) => {
+const updateNote = async (req, res) => {
 	const { id, user, title, text, completed } = req.body;
 
 	if (!id || !user || !title || !text || typeof completed !== 'boolean') {
@@ -85,12 +84,12 @@ const updateNote = asyncHandler(async (req, res) => {
 	const updatedNote = await note.save();
 
 	res.json(`Заметка ${updatedNote.title} обновлена`);
-});
+};
 
 // @desc Delete a note
 // @route DELETE /notes
 // @access Private
-const deleteNote = asyncHandler(async (req, res) => {
+const deleteNote = async (req, res) => {
 	const { id } = req.body;
 
 	if (!id) {
@@ -108,6 +107,6 @@ const deleteNote = asyncHandler(async (req, res) => {
 	const reply = `Заметка '${result.title}' с ID ${result._id} успешно удалена`;
 
 	res.json(reply);
-});
+};
 
 module.exports = { getAllNotes, createNewNote, updateNote, deleteNote };
