@@ -26,7 +26,10 @@ const createNewUser = asyncHandler(async (req, res) => {
 		return res.status(400).json({ message: 'Пожалуйста, заполните все поля' });
 	}
 
-	const duplicate = await User.findOne({ username }).lean().exec();
+	const duplicate = await User.findOne({ username })
+		.collation({ locale: 'en', strength: 2 })
+		.lean()
+		.exec();
 
 	if (duplicate) {
 		return res.status(409).json({ message: 'Пользователь с таким username уже существует' });
@@ -63,7 +66,10 @@ const updateUser = asyncHandler(async (req, res) => {
 		return res.status(400).json({ message: 'Пользователь не найден' });
 	}
 
-	const duplicate = await User.findOne({ username }).lean().exec();
+	const duplicate = await User.findOne({ username })
+		.collation({ locale: 'en', strength: 2 })
+		.lean()
+		.exec();
 
 	// Allow updates to the original user
 	if (duplicate && duplicate?._id.toString() !== id) {
