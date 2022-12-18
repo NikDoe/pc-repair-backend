@@ -57,7 +57,7 @@ const refresh = (req, res) => {
 
 	if (!cookies?.jwt)
 		return res.status(401).json({
-			message: 'запрашиваемые cookies больше не действительны! нужна аутентификация',
+			message: 'Вы вышли из системы...',
 		});
 
 	const refreshToken = cookies.jwt;
