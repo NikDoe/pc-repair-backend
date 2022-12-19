@@ -1,6 +1,3 @@
-const allowedOrigins = [
-	'http://localhost:3000',
-	// добавить сайт после деплоя
-];
+const allowedOrigins = ['https://pc-repairs.onrender.com/'];
 
 module.exports = allowedOrigins;
